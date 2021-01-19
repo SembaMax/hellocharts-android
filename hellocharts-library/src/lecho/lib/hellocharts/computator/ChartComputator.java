@@ -6,6 +6,7 @@ import android.graphics.Rect;
 
 import lecho.lib.hellocharts.listener.DummyVieportChangeListener;
 import lecho.lib.hellocharts.listener.ViewportChangeListener;
+import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.Viewport;
 
 /**
@@ -346,4 +347,11 @@ public class ChartComputator {
         minViewportHeight = this.maxViewport.height() / maxZoom;
     }
 
+    public float calculateDefaultColumnWidth() {
+        float columnWidth = ColumnChartData.DEFAULT_FILL_RATIO * getContentRectMinusAllMargins().width() / getVisibleViewport().width();
+        if (columnWidth < 2) {
+            columnWidth = 2;
+        }
+        return columnWidth;
+    }
 }

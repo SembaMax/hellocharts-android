@@ -23,6 +23,9 @@ import lecho.lib.hellocharts.view.Chart;
  */
 public class AxesRenderer {
     private static final int DEFAULT_AXIS_MARGIN_DP = 2;
+    private static final int DEFAULT_COLUMN_SPACING_DP = 3;
+    private static final int VALUES_INDICATOR_HEIGHT_DP = 4;
+    private static final int LABELS_MARGIN_DP = 4;
 
     /**
      * Axis positions indexes, used for indexing tabs that holds axes parameters, see below.
@@ -94,6 +97,13 @@ public class AxesRenderer {
     private float[][] linesDrawBufferTab = new float[4][0];
 
     /**
+     * Spacing between columns.
+     */
+    private int columnSpacing;
+    private int indicatorHeight;
+    private int labelsMargin;
+
+    /**
      * Buffers for auto-generated values for each axis, used only if there are auto axes.
      */
     private AxisAutoValues[] autoValuesBufferTab = new AxisAutoValues[]{new AxisAutoValues(),
@@ -103,6 +113,9 @@ public class AxesRenderer {
         this.chart = chart;
         computator = chart.getChartComputator();
         density = context.getResources().getDisplayMetrics().density;
+        columnSpacing = ChartUtils.dp2px(density, DEFAULT_COLUMN_SPACING_DP);
+        indicatorHeight = ChartUtils.dp2px(density, VALUES_INDICATOR_HEIGHT_DP);
+        labelsMargin = ChartUtils.dp2px(density, LABELS_MARGIN_DP);
         scaledDensity = context.getResources().getDisplayMetrics().scaledDensity;
         axisMargin = ChartUtils.dp2px(density, DEFAULT_AXIS_MARGIN_DP);
         for (int position = 0; position < 4; ++position) {
@@ -270,7 +283,7 @@ public class AxesRenderer {
         } else if (TOP == position) {
             chart.getChartComputator().insetContentRect(0, axisMargin, 0, 0);
         } else if (BOTTOM == position) {
-            chart.getChartComputator().insetContentRect(0, 0, 0, axisMargin);
+            chart.getChartComputator().insetContentRect(0, 0, 0, axisMargin * 2);
         }
     }
 
@@ -561,10 +574,11 @@ public class AxesRenderer {
                 } else {
                     lineX1 = lineX2 = rawValuesTab[position][valueToDrawIndex];
                 }
-                linesDrawBufferTab[position][valueToDrawIndex * 4 + 0] = lineX1;
-                linesDrawBufferTab[position][valueToDrawIndex * 4 + 1] = lineY1;
-                linesDrawBufferTab[position][valueToDrawIndex * 4 + 2] = lineX2;
-                linesDrawBufferTab[position][valueToDrawIndex * 4 + 3] = lineY2;
+                float space = (computator.calculateDefaultColumnWidth() / 2) + (columnSpacing / 2);
+                linesDrawBufferTab[position][valueToDrawIndex * 4 + 0] = lineX1 - space;
+                linesDrawBufferTab[position][valueToDrawIndex * 4 + 1] = lineY2;
+                linesDrawBufferTab[position][valueToDrawIndex * 4 + 2] = lineX2 - space;
+                linesDrawBufferTab[position][valueToDrawIndex * 4 + 3] = lineY2 + indicatorHeight;
             }
             canvas.drawLines(linesDrawBufferTab[position], 0, valueToDrawIndex * 4, linePaintTab[position]);
         }
@@ -605,7 +619,7 @@ public class AxesRenderer {
                         labelPaintTab[position]);
                 canvas.restore();
             } else {
-                canvas.drawText(labelBuffer, labelBuffer.length - charsNumber, charsNumber, labelX, labelY,
+                canvas.drawText(labelBuffer, labelBuffer.length - charsNumber, charsNumber, labelX, labelY + labelsMargin,
                         labelPaintTab[position]);
             }
         }
