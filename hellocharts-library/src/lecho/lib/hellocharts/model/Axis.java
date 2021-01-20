@@ -57,7 +57,7 @@ public class Axis {
     /**
      * Axis grid lines color.
      */
-    private int lineColor = ChartUtils.DEFAULT_DARKEN_COLOR;
+    private int lineColor = ChartUtils.COLOR_BLACK;
     /**
      * Typeface for labels and name text.
      */
